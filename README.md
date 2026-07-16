@@ -1,7 +1,7 @@
 # ics-openvpn — Pango fork
 
 This repository is Pango's public fork of Arne Schwabe's ics-openvpn (https://github.com/schwabe/ics-openvpn),
-forked from upstream at commit [`<base-sha>`](https://github.com/schwabe/ics-openvpn/commit/<base-sha>).
+forked from upstream at commit [`dbd1cb59fe8eabe2a041df843eab5d74014f8eb5`](https://github.com/schwabe/ics-openvpn/commit/dbd1cb59fe8eabe2a041df843eab5d74014f8eb5).
 
 This fork is distributed under the same terms as upstream, under the GNU General Public License version 2.0, with the
 OpenSSL linking exception** — see [LICENSE](../doc/LICENSE.txt) for the complete,
