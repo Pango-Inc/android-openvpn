@@ -34,7 +34,6 @@ android {
     }
     packagingOptions {
         exclude 'lib/**/libovpn3.so'
-        exclude 'lib/**/libosslspeedtest.so'
     }
     namespace 'com.pango.openvpn'
 }

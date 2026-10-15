@@ -108,23 +108,6 @@ else ()
     message("Not budiling OpenVPN for output dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif ()
 
-add_library(ovpnutil SHARED ovpnutil/jniglue.c)
-target_compile_definitions(ovpnutil PRIVATE -DTARGET_ARCH_ABI=\"${ANDROID_ABI}\"
-        -DOPENVPN2_GIT_REVISION=\"${OPENVPN2_GIT}\"
-        -DOPENVPN3_GIT_REVISION=\"${OPENVPN3_GIT}\"
-        )
-target_link_libraries(ovpnutil log)
-
-add_library(osslutil SHARED ovpnutil/osslutil.cpp)
-target_link_libraries(osslutil log crypto ssl)
-
-if (NOT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} MATCHES "build/intermediates/cmake/.*skeleton.*/")
-    add_library(osslspeedtest SHARED ovpnutil/sslspeed.c)
-    target_link_libraries(osslspeedtest log crypto ssl)
-else ()
-    message("Not budiling SSLSpeedTest for output dir ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-endif ()
-
 set(openvpn_srcs
         src/compat/compat-basename.c
         src/compat/compat-daemon.c
@@ -253,11 +236,12 @@ else ()
     target_link_libraries(openvpn crypto ssl lzo lz4)
 endif ()
 
-add_executable(libovpnexec.so minivpn/minivpn.c)
+# The executables take main() from libopenvpn; ovpnexec.c is an empty placeholder source.
+add_executable(libovpnexec.so ovpnexec/ovpnexec.c)
 target_compile_options(libovpnexec.so PRIVATE -fPIE)
 target_link_libraries(libovpnexec.so PRIVATE openvpn -fPIE -pie)
 
-add_executable(pie_openvpn.${ANDROID_ABI} minivpn/minivpn.c)
+add_executable(pie_openvpn.${ANDROID_ABI} ovpnexec/ovpnexec.c)
 target_compile_options(pie_openvpn.${ANDROID_ABI} PRIVATE -fPIE)
 target_link_libraries(pie_openvpn.${ANDROID_ABI} PRIVATE openvpn -fPIE -pie)
 
@@ -274,7 +258,7 @@ add_custom_command(TARGET pie_openvpn.${ANDROID_ABI} POST_BUILD
         ${OVPN_ASSET_DIR}
         )
 
-# Hack that these targets are really executed
-add_dependencies(ovpnutil pie_openvpn.${ANDROID_ABI})
+# Hack that these targets are really executed. Not on openvpn: pie_openvpn links it, a cycle.
+add_dependencies(libovpnexec.so pie_openvpn.${ANDROID_ABI})
 add_dependencies(pie_openvpn.${ANDROID_ABI} makeassetdir)
 
